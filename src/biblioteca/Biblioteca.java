@@ -128,7 +128,7 @@ public class Biblioteca {
 		
 		if(contains != -1) {
 			
-			System.out.println("Este libro ya ha sido añadido anteriormente");
+			System.out.println("Este libro ya ha sido  añadido anteriormente");
 			System.out.println("Quieres añadir un ejemplar? S/N");
 			String res = sc.nextLine();
 			
