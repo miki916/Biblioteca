@@ -1,6 +1,8 @@
 package biblioteca;
 
-public class Ejemplar{
+import java.io.Serializable;
+
+public class Ejemplar implements Serializable{
 	
 	private Libro l;
 	private Persona socio;
@@ -11,7 +13,7 @@ public class Ejemplar{
 		this.l = l;
 		socio = null;
 		code = l.getEjemplares().size()+1;
-		this.l.aÃ±adirEjemplar(this);
+		this.l.añadirEjemplar(this);
 		
 	}
 
@@ -38,5 +40,29 @@ public class Ejemplar{
 	public void setCode(int code) {
 		this.code = code;
 	}
+	
+	public boolean prestado() {
+		
+		if(socio==null)
+			return false;
+		
+		return true;
+
+	}
+
+	@Override
+	public String toString() {
+		
+		if(socio == null)
+		
+			return "Code: " + code + "\n" +  "Libro: " + l.getTitulo() + "Socio: null";
+		
+		else
+			
+			return "Code: " + code + " " +  "Libro: " + l.getTitulo() + " " + "Socio: " + socio.getNombre();
+
+	}
+	
+	
 
 }

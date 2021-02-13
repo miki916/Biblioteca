@@ -6,8 +6,6 @@ public class Test {
 		
 		Biblioteca b = new Biblioteca();
 			
-		
-		
 	}
 	
 }

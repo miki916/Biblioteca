@@ -1,10 +1,17 @@
 package biblioteca;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Scanner;
 
-public class Biblioteca {
+public class Biblioteca implements Serializable {
 	
 	public ArrayList<Persona> socios;
 	public ArrayList<Libro> libros;
@@ -36,12 +43,195 @@ public class Biblioteca {
 		case 5 : listarLibros();
 			break;
 		
+		case 6:  prestamoLibros();
+			break;
+		
+		case 7:  devolucionLibro();
+			break;
+			
+		case 8: situacionSocio();
+			break;
+		
+		case 9: situacionLibro();
+			break;
+			
+		case 10: guardar();
+			break;
+			
+		case 11: cargarInfo();
+			break;
+		
+		default: System.out.println("BYE!!");
+			break;
+		
+		
 		}
 		
 	}
 
+	private void cargarInfo() {
+		
+		load();
+		System.out.println("Cargado");
+		opcion(menu());
+	}
+
+	private void guardar() {
+		
+		store();
+		System.out.println("Guardado");
+		opcion(menu());
+	}
+
+	private void situacionLibro() {
+		
+		Libro l = containsLibro(preguntarLibro());
+		
+		if(l == null) {
+			
+			System.out.println("No existe ese libro");
+			opcion(menu());
+			
+		}else {
+			
+			System.out.println(l.situacionLibro());
+			opcion(menu());
+
+		}
+			
+		
+	}
+
+	private void situacionSocio() {
+		
+		Persona p = containsSocios(preguntarUsuario());
+		
+		if(p == null) {
+			
+			System.out.println("No existe ese socio");
+			opcion(menu());
+			
+		}else {
+			
+			System.out.println(p.situacionPersona());
+			opcion(menu());
+
+		}	
+		
+		
+	}
+
+	private void devolucionLibro() {
+		
+		Persona contains = containsSocios(preguntarUsuario());
+		
+		if(contains != null) {
+
+				if(contains.devolverEjemplar(preguntarLibro())) {						
+					System.out.println("Libro devuelto");
+					opcion(menu());
+							
+				}else {
+							
+					System.out.println("No tiene ese ejemplar");
+					opcion(menu());
+							
+				}
+				
+		}else
+			opcion(menu());		
+	}
+
+	private int preguntarLibro() {
+		
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Dime el ISBN del libro: ");
+		return sc.nextInt();
+	}
+
+	private int preguntarUsuario() {
+		Scanner sc = new Scanner(System.in);
+		
+		System.out.println("Introduceme el DNI del socio: ");
+		return sc.nextInt();	
+		
+	}
+
+	private void prestamoLibros() {
+		
+		
+		Persona containsSocio= containsSocios(preguntarUsuario());
+		
+		if(containsSocio != null) {
+		
+			
+			Libro containsLibros = containsLibro(preguntarLibro());
+				
+				if(containsLibros != null) {
+					
+					if(containsSocio.añadirEjemplar(containsLibros)) {
+						
+						System.out.println("Libro prestado");
+						opcion(menu());
+
+						
+					}else {
+						
+						System.out.println("No quedan ejemplares de ese libro");
+						opcion(menu());
+						
+					}
+				}else
+					opcion(menu());
+		}else
+			opcion(menu());
+	}
+
 	private void listarLibros() {
-		// TODO Auto-generated method stub
+
+		Scanner sc = new Scanner(System.in);
+		
+		System.out.println("Como quieres mostrar los libros ? ");
+		System.out.println("  Titulo [0]");
+		System.out.println("  Autor [1]");
+		System.out.println("  Cantidad de ejemplares [2]");
+		int res = sc.nextInt();
+		
+		switch(res) {
+		
+			case 0: listarLTitulo();
+				break;
+			case 1: listarLAutor();
+				break;
+			case 2: listarLEjemplares();
+				break;
+			default: listarLibros();
+		
+		}
+		
+	}
+
+	private void listarLEjemplares() {
+		
+		libros.sort((arg0,  arg1)-> arg0.getEjemplares().size()-arg1.getEjemplares().size());
+		mostrarListLibros(libros);
+		opcion(menu());
+		
+	}
+
+	private void listarLAutor() {
+		
+		libros.sort((arg0,  arg1)-> arg0.getAutor().compareTo(arg1.getAutor()));
+		mostrarListLibros(libros);
+		opcion(menu());
+		
+	}
+
+	private void listarLTitulo() {
+		
+		libros.sort((arg0,  arg1)-> arg0.getTitulo().compareTo(arg1.getTitulo()));
+		mostrarListLibros(libros);
+		opcion(menu());
 		
 	}
 
@@ -49,30 +239,33 @@ public class Biblioteca {
 
 		Scanner sc = new Scanner(System.in);
 		
-		System.out.println("Quieres listar los socios por nombre (0) o por cantidad de prestados (1)");
+		System.out.println("Quieres mostrar los socios ?");
+		System.out.println("  Nombre [0]");
+		System.out.println("  Cantidad de Prestados [1]");
 		int res = sc.nextInt();
 		
-		if(res == 0)
-			listarSNombre();
-		else if (res == 1)
-			listarSPrestados();
-		else
-			listarSocios();		
+		switch(res) {
+		
+		case 0: listarSNombre();
+			break;
+		case 1: listarSPrestados();
+			break;
+		default: listarSocios();
+	
+		}
 	}
 
 	private void listarSPrestados() {
 		
 		socios.sort(Comparator.comparing(Persona::getnPrestados));			
-		mostrarArrayList(socios);
+		mostrarListSocios(socios);
 		opcion(menu());
 	}
 
 	private void listarSNombre() {
-		
-		socios.add(new Persona("a", "a", 4));
-		
+				
 		socios.sort((arg0,  arg1)-> arg0.getNombre().compareTo(arg1.getNombre()));
-		mostrarArrayList(socios);
+		mostrarListSocios(socios);
 		opcion(menu());
 	}
 
@@ -82,12 +275,17 @@ public class Biblioteca {
 		System.out.println("Introduceme el ISBN del libro: ");
 		int ISBN = sc.nextInt();
 		
-		int contains = containsLibro(ISBN);
+		Libro contains = containsLibro(ISBN);
 		
-		if(contains != -1){
+		if(contains != null){
 			
-			new Ejemplar(libros.get(contains));
-			System.out.println("Ejemplar aÃ±adido");
+			System.out.println("Cuantos desea añadir?");
+			int c = sc.nextInt();
+			
+			for(int i = 0;i<c;i++)
+				new Ejemplar(contains);
+			
+			System.out.println("Ejemplares añadidos");
 			opcion(menu());
 			
 		}else {
@@ -97,39 +295,22 @@ public class Biblioteca {
 		}		
 	}
 
-	private int containsLibro(int ISBN) {
-		
-		int i = 0;
-		
-		for(Libro libro : libros) {
-			
-			if(libro.getISBN() == ISBN) 
-				return i;	
-			
-			i++;	
-		}	
-		
-		return -1;
-		
-	}
-
 	private void altaLibro() {
 		
 		Scanner sc = new Scanner(System.in);
-		
-		System.out.println("Introduce el ISBN del libro: ");
-		int ISBN = sc.nextInt();
 		System.out.println("Introduce el autor del libro: ");
 		String autor = sc.nextLine();
+		System.out.println("Introduce el ISBN del libro: ");
+		int ISBN = sc.nextInt();
 		System.out.println("Introduceme el titulo del libro: ");
-		String titulo = sc.nextLine();
+		String titulo = sc.next();
 		
-		int contains = containsLibro(ISBN);
+		Libro contains = containsLibro(ISBN);
 		
-		if(contains != -1) {
+		if(contains != null) {
 			
-			System.out.println("Este libro ya ha sido  aÃ±adido anteriormente");
-			System.out.println("Quieres aÃ±adir un ejemplar? S/N");
+			System.out.println("Este libro ya ha sido  añadido anteriormente");
+			System.out.println("Quieres añadir un ejemplar? S/N");
 			String res = sc.nextLine();
 			
 				if(res.toUpperCase().compareTo("N") == 0) 
@@ -139,7 +320,7 @@ public class Biblioteca {
 		}else {
 			
 			libros.add(new Libro(ISBN,autor,titulo));
-			System.out.println("Libro aÃ±adido");
+			System.out.println("Libro añadido");
 			opcion(menu());
 			
 		}	
@@ -156,15 +337,9 @@ public class Biblioteca {
 		System.out.println("Introduceme el DNI del socio: ");
 		int DNI = sc.nextInt();
 		
-		boolean encontrado = false;
+		Persona contains = containsSocios(DNI);
 		
-		for(Persona socio : socios) {
-			
-			if(socio.getDNI() == DNI) 				
-				encontrado = true;			
-		}	
-		
-		if(encontrado) {
+		if(contains != null) {
 			
 			System.out.println("Este socio ya ha sido aÃ±adido anteriormente");
 			altaSocio();
@@ -172,13 +347,41 @@ public class Biblioteca {
 		}else {
 			
 			socios.add(new Persona(nombre,apellidos,DNI));
-			System.out.println("Usuario aÃ±adido");
+			System.out.println("Usuario añadido");
 			opcion(menu());
 						
 		}
 	}
+
+	private Libro containsLibro(int ISBN) {
+		
+		
+		for(Libro libro : libros) {
+			
+			if(libro.getISBN() == ISBN) 
+				return libro;	
+			
+		}	
+		
+		return null;
+		
+	}
 	
-	private void mostrarArrayList(ArrayList<T> l) {
+	private Persona containsSocios(int DNI) {
+		
+		for(Persona p : socios) {
+			
+			if(p.getDNI() == DNI) 
+				
+				return p;	
+		
+		}	
+		
+		return null;
+		
+	}
+	
+	private void mostrarListSocios(ArrayList<Persona> l) {
 		
 		for(Object o : l) {
 			
@@ -186,6 +389,54 @@ public class Biblioteca {
 			
 		}
 		
+	}
+	
+	private void mostrarListLibros(ArrayList<Libro> l) {
+		
+		for(Object o : l) {
+				
+			System.out.println(o.toString());
+				
+		}
+	}
+	
+	public void load() {
+		
+		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("fichero.txt"))) {
+
+			socios= (ArrayList<Persona>)ois.readObject();
+			libros= (ArrayList<Libro>) ois.readObject();
+			
+
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
+	public void store() {
+
+		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("fichero.txt"))) {
+
+			oos.writeObject(socios);
+			oos.writeObject(libros);
+
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 	
 	private int menu() {
